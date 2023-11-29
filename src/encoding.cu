@@ -144,7 +144,7 @@ Encoding<T>* create_encoding(uint32_t n_dims_to_encode, const json& encoding, ui
 	return result;
 }
 
-#if TCNN_HALF_PRECISION
+#if defined(TCNN_HALF_PRECISION)
 template Encoding<__half>* create_encoding(uint32_t n_dims_to_encode, const json& encoding, uint32_t alignment);
 #endif
 template Encoding<float>* create_encoding(uint32_t n_dims_to_encode, const json& encoding, uint32_t alignment);

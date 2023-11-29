@@ -157,7 +157,7 @@ Module* create_encoding(uint32_t n_input_dims, const json& encoding, Precision r
 	if (requested_precision == Precision::Fp32) {
 		return new DifferentiableObject<float>{tcnn::create_encoding<float>(n_input_dims, encoding, 0)};
 	}
-#if TCNN_HALF_PRECISION
+#if defined(TCNN_HALF_PRECISION)
 	return new DifferentiableObject<__half>{tcnn::create_encoding<__half>(n_input_dims, encoding, 0)};
 #else
 	throw std::runtime_error{"TCNN was not compiled with half-precision support."};

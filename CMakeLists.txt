@@ -33,6 +33,13 @@ option(TCNN_BUILD_BENCHMARK "Build tiny-cuda-nn example benchmark?" ON)
 option(TCNN_BUILD_EXAMPLES "Build tiny-cuda-nn example applications?" ON)
 option(TCNN_ALLOW_CUBLAS_CUSOLVER "Allows tiny-cuda-nn to use cuBLAS and cuSolver. Only required for the Shampoo optimizer." OFF)
 set(TCNN_CUDA_ARCHITECTURES "" CACHE STRING "Build tiny-cuda-nn for a specific GPU architecture.")
+option(TCNN_HALF_PRECISION "Use half precision" OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
+if(TCNN_HALF_PRECISION)
+    add_definitions(-DTCNN_HALF_PRECISION)
+	message(STATUS "TCNN_HALF_PRECISION is enabled.")
+endif()
 
 ###############################################################################
 # Build type and C++ compiler setup
