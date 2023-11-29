@@ -56,6 +56,12 @@ if "--no-networks" in sys.argv:
 	sys.argv.remove("--no-networks")
 	print("Building >> without << neural networks (just the input encodings)")
 
+precision = 32
+if "--half_precision" in sys.argv:
+	precision = 16
+	sys.argv.remove("--half_precision")
+	print("Building >> with << half precision")
+
 if os.name == "nt":
 	def find_cl_path():
 		import glob
@@ -140,7 +146,7 @@ base_definitions = [
 ]
 
 base_source_files = [
-	"tinycudann/bindings.cpp",
+	f"tinycudann{precision}/bindings.cpp",
 	"../../dependencies/fmt/src/format.cc",
 	"../../dependencies/fmt/src/os.cc",
 	"../../src/cpp_api.cu",
@@ -160,6 +166,8 @@ else:
 def make_extension(compute_capability):
 	nvcc_flags = base_nvcc_flags + [f"-gencode=arch=compute_{compute_capability},code={code}_{compute_capability}" for code in ["compute", "sm"]]
 	definitions = base_definitions + [f"-DTCNN_MIN_GPU_ARCH={compute_capability}"]
+	if precision == 16:
+		definitions.append("-DTCNN_HALF_PRECISION")
 
 	if include_networks and compute_capability > 70:
 		source_files = base_source_files + ["../../src/fully_fused_mlp.cu"]
@@ -170,7 +178,7 @@ def make_extension(compute_capability):
 	cflags = base_cflags + definitions
 
 	ext = CUDAExtension(
-		name=f"tinycudann_bindings._{compute_capability}_C",
+		name=f"tinycudann{precision}_bindings._{compute_capability}_C",
 		sources=source_files,
 		include_dirs=[
 			f"{root_dir}/include",
@@ -187,7 +195,7 @@ def make_extension(compute_capability):
 ext_modules = [make_extension(comp) for comp in compute_capabilities]
 
 setup(
-	name="tinycudann",
+	name=f"tinycudann{precision}",
 	version=VERSION,
 	description="tiny-cuda-nn extension for PyTorch",
 	long_description="tiny-cuda-nn extension for PyTorch",
@@ -210,7 +218,7 @@ setup(
 	maintainer_email="tmueller@nvidia.com",
 	download_url=f"https://github.com/nvlabs/tiny-cuda-nn",
 	license="BSD 3-Clause \"New\" or \"Revised\" License",
-	packages=["tinycudann"],
+	packages=[f"tinycudann{precision}"],
 	install_requires=[],
 	include_package_data=True,
 	zip_safe=False,
